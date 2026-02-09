@@ -28,7 +28,7 @@ This script does support overwriting the mail_crypt using the keys in the backup
 
 ### restore_domain.sh
 
-Mailcow's backup and restore script isn't very flexible if you only want to domains as a whole, it's really all or nothing so this script allows per-domain restores and it will restore:
+Mailcow's backup and restore script isn't very flexible if you only want to domains, it's really all or nothing so this script allows per-domain restores and it will restore:
 
 - Domain + domain aliases
 - Mailboxes (incl passwords and mail)
