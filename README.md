@@ -3,6 +3,8 @@ What will become a collection of tools for mailcow-dockerized.
 
 🐮 Obligatory make sure you take a backup of your Mailcow instance before restoring just in case. I'll try and keep up testing with Mailcow updates, but there's always a chance something changes or I've missed something, and especially since we're restoring into Mailcow's databases it's always better to be safe than sorry.
 
+**Currently last tested both scripts against:** Mailcow 2026-01 (running on RHEL 9.7)
+
 ## Backup Restore Scripts
 
 Currently only works with Mailcow's own backup (working on borg and have switched my own server to using it to give me the motivation, and Mailcow's borg implementation supports per-mailbox restore anyway I suppose). 
@@ -21,8 +23,6 @@ Please note these scripts are intended for restoring from backup to the same ser
 - you used the same key on both servers
 
 This script does support overwriting the mail_crypt using the keys in the backup though since I wanted to test restoring select domains from a backup made on my main server to my dev server before trying it live out of laziness. 
-
-**Currently last tested both scripts against:** Mailcow 2026-01 (running on RHEL 9.7)
 
 I put mine in the `helper-scripts` folder with Mailcow's scripts for ease of access (I use _ in the file name instead of - to differentiate mine from theirs), but should work anywhere.
 
