@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# 20260209 - Mailbox restore script for mailcow
+# 20260209b - Mailbox restore script for mailcow
 # Find my Mailcow tools here:
 # https://github.com/itslikethatyall/mailcow-tools/
 #
@@ -806,12 +806,20 @@ else
   elif [[ "${BACKUP_PUBKEY}" == "${LIVE_PUBKEY}" ]]; then
     echo "mail_crypt keys match (backup == live) - restored mail will be readable"
   else
-    echo "!!! WARNING: mail_crypt keys DIFFER between backup and live server!"
-    echo "  Restored mail files were encrypted with a different key."
-    echo "  Without restoring crypt keys, the restored mail will be UNREADABLE."
-    echo "  Consider using restore_domain.sh which can restore crypt keys."
+    echo "mail_crypt keys DIFFER between backup and live server"
     CRYPT_MISMATCH=1
   fi
+fi
+
+# Abort on mail_crypt mismatch - restore_mailbox cannot restore crypt keys
+if [[ ${CRYPT_MISMATCH} -eq 1 ]]; then
+  echo
+  echo "ERROR: mail_crypt keys differ between backup and live server."
+  echo "Restored mail files would be UNREADABLE without the matching private key."
+  echo ""
+  echo "This script cannot restore mail_crypt keys. Use restore_domain.sh instead:"
+  echo "  ./restore_domain.sh ${BACKUP_LOCATION} ${TARGET_DOMAIN}"
+  error_exit "mail_crypt key mismatch - cannot restore mailbox safely"
 fi
 
 echo
@@ -832,9 +840,6 @@ fi
 if [[ ${SOGO_CAL_COUNT} -gt 0 || ${SOGO_CONTACT_COUNT} -gt 0 ]]; then
   echo "  - Restore SOGo calendars (${SOGO_CAL_COUNT} events) and contacts (${SOGO_CONTACT_COUNT})"
 fi
-if [[ ${CRYPT_MISMATCH} -eq 1 ]]; then
-  echo "  - !!! mail_crypt keys differ - restored mail may be UNREADABLE"
-fi
 echo
 
 if [[ ${CONFIRM_RESTORE} -eq 0 ]]; then
@@ -852,7 +857,7 @@ echo
 # Step 7: FINAL CONFIRMATION
 
 echo "═══════════════════════════════════════════════════════════════════════════════"
-echo "!!! FINAL CONFIRMATION - YOU ARE ABOUT TO MODIFY THE LIVE MAILCOW DATABASE ⚠️"
+echo "!!! FINAL CONFIRMATION - YOU ARE ABOUT TO MODIFY THE LIVE MAILCOW DATABASE !!!"
 echo "═══════════════════════════════════════════════════════════════════════════════"
 echo ""
 echo "Mailbox: ${TARGET_MAILBOX}"
@@ -874,9 +879,6 @@ if [[ ${MAILBOX_EXISTS} -gt 0 ]]; then
   if [[ -n "${PREBACKUP_FILE}" ]] && [[ -f "${PREBACKUP_FILE}" ]]; then
     echo "Pre-restore backup saved to: ${PREBACKUP_FILE}"
   fi
-fi
-if [[ ${CRYPT_MISMATCH} -eq 1 ]]; then
-  echo "!!! mail_crypt keys differ - restored mail may be UNREADABLE"
 fi
 echo ""
 
@@ -1128,10 +1130,6 @@ echo "  - Mailbox exists: Yes"
 echo "  - Aliases: ${ALIAS_RESTORED}"
 if [[ ${SOGO_CAL_COUNT} -gt 0 || ${SOGO_CONTACT_COUNT} -gt 0 ]]; then
   echo "  - SOGo: ${SOGO_CAL_COUNT} calendar events, ${SOGO_CONTACT_COUNT} contacts"
-fi
-if [[ ${CRYPT_MISMATCH} -eq 1 ]]; then
-  echo "  - mail_crypt: !!! Keys differ - restored mail may be unreadable!"
-  echo "    → Use restore_domain.sh to restore crypt keys if needed"
 fi
 
 if [[ -n "${PREBACKUP_FILE}" ]] && [[ -f "${PREBACKUP_FILE}" ]]; then

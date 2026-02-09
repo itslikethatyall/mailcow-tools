@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# 
-# 20260209 - Domain restore script for mailcow
+#
+# 20260209b - Domain restore script for mailcow
 # Find my Mailcow tools here:
 # https://github.com/itslikethatyall/mailcow-tools/
 #
@@ -25,13 +25,14 @@
 
 # Validate arguments
 if [[ $# -lt 2 ]]; then
-  echo "Usage: $0 <backup_location> <domain_name> [--force] [--confirm]"
+  echo "Usage: $0 <backup_location> <domain_name> [--force] [--confirm] [--forcemailcrypt]"
   echo ""
   echo "Example: $0 /backups/2026-02-06/mailcow-2026-02-06-21-17-15 example.com"
   echo ""
   echo "Options:"
-  echo "--force         Overwrite existing domain"
-  echo "--confirm       Skip confirmations before restoring"
+  echo "--force           Overwrite existing domain"
+  echo "--confirm         Skip confirmations before restoring"
+  echo "--forcemailcrypt  Proceed even if mail_crypt keys differ (mail may be unreadable)"
   exit 1
 fi
 
@@ -39,12 +40,14 @@ BACKUP_LOCATION="${1}"
 TARGET_DOMAIN="${2}"
 FORCE=0
 CONFIRM_RESTORE=0
+FORCE_MAILCRYPT=0
 
 shift 2
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --force) FORCE=1 ;;
     --confirm) CONFIRM_RESTORE=1 ;;
+    --forcemailcrypt) FORCE_MAILCRYPT=1 ;;
   esac
   shift
 done
@@ -957,11 +960,35 @@ else
   elif [[ "${BACKUP_PUBKEY}" == "${LIVE_PUBKEY}" ]]; then
     echo "mail_crypt keys match (backup == live) - restored mail will be readable"
   else
-    echo "!!!  WARNING: mail_crypt keys DIFFER between backup and live server!"
-    echo "Restored mail files were encrypted with a different key."
-    echo "Without restoring crypt keys, the restored mail will be UNREADABLE."
+    echo "mail_crypt keys DIFFER between backup and live server"
     CRYPT_MISMATCH=1
     SKIP_CRYPT=0
+  fi
+fi
+
+# Prompt for mail_crypt mismatch before proceeding
+if [[ ${CRYPT_MISMATCH} -eq 1 ]]; then
+  echo
+  if [[ ${FORCE_MAILCRYPT} -eq 0 ]]; then
+    echo "═══════════════════════════════════════════════════════════════════════════════"
+    echo "!!! mail_crypt KEY MISMATCH DETECTED"
+    echo "═══════════════════════════════════════════════════════════════════════════════"
+    echo ""
+    echo "The backup was encrypted with a DIFFERENT mail_crypt key than the live server."
+    echo "Restored mail files will be UNREADABLE without the matching private key."
+    echo ""
+    echo "Options:"
+    echo "  - Cancel the restore and investigate the key mismatch (recommended)"
+    echo "  - Proceed and restore crypt keys from backup"
+    echo "  - Use --forcemailcrypt to bypass this check and forcably restore backup keys (not recommended without verifying keys first)"
+    echo ""
+    read -p "Continue despite mail_crypt key mismatch? [y|N] " -r
+    if [[ ! ${REPLY} =~ ^[Yy]$ ]]; then
+      echo "Restore cancelled due to mail_crypt key mismatch"
+      exit 0
+    fi
+  else
+    echo "(Skipping mail_crypt mismatch prompt due to --forcemailcrypt flag)"
   fi
 fi
 
