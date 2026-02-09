@@ -26,7 +26,7 @@ Please note these scripts are intended for restoring from backup to the same ser
 
 This script does support overwriting the mail_crypt using the keys in the backup though since I wanted to test restoring select domains from a backup made on my main server to my dev server before trying it live out of laziness.
 
-You can use the `--forcemailcrypt` flag if you wish to overwrite the mail_crypt keys without being prompted
+You can use the `--forcemailcrypt` flag with **restore_domain.sh** if you wish to overwrite the mail_crypt keys without being prompted
 
 ### restore_domain.sh
 
