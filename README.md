@@ -1,4 +1,4 @@
-# mailcow_tools
+# mailcow tools
 What will become a collection of tools for mailcow-dockerized. 
 
 🐮 Obligatory make sure you take a backup of your Mailcow instance before restoring just in case. I'll try and keep up testing with Mailcow updates, but there's always a chance something changes or I've missed something, and especially since we're restoring into Mailcow's databases it's always better to be safe than sorry.
