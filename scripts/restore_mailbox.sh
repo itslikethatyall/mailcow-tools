@@ -24,14 +24,13 @@
 
 # Validate arguments
 if [[ $# -lt 2 ]]; then
-  echo "Usage: $0 <backup_location> <mailbox@example.com> [--force] [--confirm] [--forcemailcrypt]"
+  echo "Usage: $0 <backup_location> <mailbox@example.com> [--force] [--confirm]"
   echo ""
   echo "Example: $0 /backups/2026-02-06/mailcow-2026-02-06-21-17-15 mailbox@example.com"
   echo ""
   echo "Options:"
-  echo "  --force           Overwrite existing mailbox"
-  echo "  --confirm         Skip confirmations before restoring"
-  echo "  --forcemailcrypt  Proceed even if mail_crypt keys differ (mail may be unreadable)"
+  echo "  --force         Overwrite existing mailbox"
+  echo "  --confirm       Skip confirmations before restoring"
   echo ""
   echo "Note: The domain must already exist on the live server."
   echo "      Use restore_domain.sh to restore an entire domain first if needed."
@@ -42,7 +41,6 @@ BACKUP_LOCATION="${1}"
 TARGET_MAILBOX="${2}"
 FORCE=0
 CONFIRM_RESTORE=0
-FORCE_MAILCRYPT=0
 
 # Validate mailbox format (must contain @)
 if [[ "${TARGET_MAILBOX}" != *"@"* ]]; then
@@ -67,7 +65,6 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --force) FORCE=1 ;;
     --confirm) CONFIRM_RESTORE=1 ;;
-    --forcemailcrypt) FORCE_MAILCRYPT=1 ;;
   esac
   shift
 done
@@ -814,30 +811,15 @@ else
   fi
 fi
 
-# Prompt for mail_crypt mismatch before proceeding
+# Abort on mail_crypt mismatch - restore_mailbox cannot restore crypt keys
 if [[ ${CRYPT_MISMATCH} -eq 1 ]]; then
   echo
-  if [[ ${FORCE_MAILCRYPT} -eq 0 ]]; then
-    echo "═══════════════════════════════════════════════════════════════════════════════"
-    echo "!!! mail_crypt KEY MISMATCH DETECTED"
-    echo "═══════════════════════════════════════════════════════════════════════════════"
-    echo ""
-    echo "The backup was encrypted with a DIFFERENT mail_crypt key than the live server."
-    echo "Restored mail files will be UNREADABLE without the matching private key."
-    echo ""
-    echo "Options:"
-    echo "  - Cancel the restore and investigate the key mismatch (recommended)"
-    echo "  - Use restore_domain.sh to restore the domain including crypt keys"
-    echo "  - Use --forcemailcrypt to bypass this check and forcably restore backup keys (not recommended without verifying keys first)"
-    echo ""
-    read -p "Continue despite mail_crypt key mismatch? [y|N] " -r
-    if [[ ! ${REPLY} =~ ^[Yy]$ ]]; then
-      echo "Restore cancelled due to mail_crypt key mismatch"
-      exit 0
-    fi
-  else
-    echo "(Skipping mail_crypt mismatch prompt due to --forcemailcrypt flag)"
-  fi
+  echo "ERROR: mail_crypt keys differ between backup and live server."
+  echo "Restored mail files would be UNREADABLE without the matching private key."
+  echo ""
+  echo "This script cannot restore mail_crypt keys. Use restore_domain.sh instead:"
+  echo "  ./restore_domain.sh ${BACKUP_LOCATION} ${TARGET_DOMAIN}"
+  error_exit "mail_crypt key mismatch - cannot restore mailbox safely"
 fi
 
 echo
@@ -857,9 +839,6 @@ if [[ ${SKIP_VMAIL} -eq 0 ]]; then
 fi
 if [[ ${SOGO_CAL_COUNT} -gt 0 || ${SOGO_CONTACT_COUNT} -gt 0 ]]; then
   echo "  - Restore SOGo calendars (${SOGO_CAL_COUNT} events) and contacts (${SOGO_CONTACT_COUNT})"
-fi
-if [[ ${CRYPT_MISMATCH} -eq 1 ]]; then
-  echo "  - !!! mail_crypt keys differ - restored mail may be UNREADABLE"
 fi
 echo
 
@@ -900,9 +879,6 @@ if [[ ${MAILBOX_EXISTS} -gt 0 ]]; then
   if [[ -n "${PREBACKUP_FILE}" ]] && [[ -f "${PREBACKUP_FILE}" ]]; then
     echo "Pre-restore backup saved to: ${PREBACKUP_FILE}"
   fi
-fi
-if [[ ${CRYPT_MISMATCH} -eq 1 ]]; then
-  echo "!!! mail_crypt keys differ - restored mail may be UNREADABLE"
 fi
 echo ""
 
@@ -1154,10 +1130,6 @@ echo "  - Mailbox exists: Yes"
 echo "  - Aliases: ${ALIAS_RESTORED}"
 if [[ ${SOGO_CAL_COUNT} -gt 0 || ${SOGO_CONTACT_COUNT} -gt 0 ]]; then
   echo "  - SOGo: ${SOGO_CAL_COUNT} calendar events, ${SOGO_CONTACT_COUNT} contacts"
-fi
-if [[ ${CRYPT_MISMATCH} -eq 1 ]]; then
-  echo "  - mail_crypt: !!! Keys differ - restored mail may be unreadable!"
-  echo "    → Use restore_domain.sh to restore crypt keys if needed"
 fi
 
 if [[ -n "${PREBACKUP_FILE}" ]] && [[ -f "${PREBACKUP_FILE}" ]]; then
