@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 #
-# Restore individual mailbox from mailcow backup v1.0
+# 20260209 - Mailbox restore script for mailcow
+# Find my Mailcow tools here:
+# https://github.com/itslikethatyall/mailcow-tools/
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

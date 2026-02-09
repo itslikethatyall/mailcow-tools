@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-#
+# 
+# 20260209 - Domain restore script for mailcow
 # Find my Mailcow tools here:
 # https://github.com/itslikethatyall/mailcow-tools/
 #
