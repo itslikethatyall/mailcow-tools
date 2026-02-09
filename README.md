@@ -14,17 +14,19 @@ Currently only works with Mailcow's own backup (working on borg and have switche
 These scripts work by extracting the domain in question from the Mailcow backup, copying it to a staging directory, and then validating all changes will work prior to restoring things to Mailcow's MariaDB and Redis databases.
 
 - you can use the `--force` flag if you wish to restore a domain/mailbox that already exists on the server
-- you can use the `--confirm` flag if you wish to restore multiple domains/mailboxes sequentially without being prompted to check each time
+- you can use the `--confirm` flag if you wish to restore multiple domains/mailboxes sequentially without being prompted to check each time (will still prompt if mail_crypt mismatches)
 
 ### ⚠️ Important note about Dovecot mail_crypt
 
-Please note these scripts are intended for restoring from backup to the same server they were on originally. Unfortunately because Mailcow uses Dovecot's mail_crypt with a global key instead of utilising per-user keys, you effectively cannot use these scripts to restore to a different server unless:
+Please note these scripts are intended for restoring from backup to the same server they were on originally. Unfortunately because Mailcow uses Dovecot's mail_crypt with global keys instead of utilising per-user keys, you effectively cannot use these scripts to restore to a different server unless:
 
-- you're happy overwriting mail_crypt (which on an existing server will result in you losing losing access to existing mailboxes encrypted using the old key)
+- you're happy overwriting mail_crypt (which on an existing server will result in you losing losing access to existing mailboxes encrypted using the old keys)
 - you don't use mail_crypt
-- you used the same key on both servers
+- you used the same keys on both servers
 
-This script does support overwriting the mail_crypt using the keys in the backup though since I wanted to test restoring select domains from a backup made on my main server to my dev server before trying it live out of laziness. 
+This script does support overwriting the mail_crypt using the keys in the backup though since I wanted to test restoring select domains from a backup made on my main server to my dev server before trying it live out of laziness.
+
+You can use the `--forcemailcrypt` flag if you wish to overwrite the mail_crypt keys without being prompted
 
 ### restore_domain.sh
 
