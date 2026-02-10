@@ -19,8 +19,11 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1335 USA
 #
 
+#
 # Restore individual mailbox from mailcow backup
 # Usage: ./restore_mailbox.sh <backup_location> <mailbox_address> [--force] [--confirm]
+# A pre-restore backup is always created before overwriting existing data.
+#
 
 # Validate arguments
 if [[ $# -lt 2 ]]; then

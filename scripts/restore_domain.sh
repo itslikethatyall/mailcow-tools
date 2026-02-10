@@ -19,17 +19,19 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1335 USA
 #
 
+#
 # Restore individual domain from mailcow backup
-# Usage: ./restore_domain.sh <backup_location> <domain_name> [--force] [--confirm]
+# Usage: ./restore_domain.sh <backup_location> <domain_name> [--force] [--confirm] [--forcemailcrypt]
 # A pre-restore backup is always created before overwriting existing data.
+#
 
 # Validate arguments
 if [[ $# -lt 2 ]]; then
-  echo "Usage: $0 <backup_location> <domain_name> [--force] [--confirm] [--forcemailcrypt]"
+  echo "Usage: $0 <backup_location> <domain_name> <flag>"
   echo ""
   echo "Example: $0 /backups/2026-02-06/mailcow-2026-02-06-21-17-15 example.com"
   echo ""
-  echo "Options:"
+  echo "Flags:"
   echo "--force           Overwrite existing domain"
   echo "--confirm         Skip confirmations before restoring"
   echo "--forcemailcrypt  Proceed even if mail_crypt keys differ (mail may be unreadable)"
