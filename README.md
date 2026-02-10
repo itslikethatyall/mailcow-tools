@@ -66,7 +66,7 @@ Restore a domain that already exists:
 Run without confirmation prompts:
 
 ```bash
-./restore_domain.sh /backups/2026-02-06/mailcow-2026-02-06-21-17-15 example.com --silent
+./restore_domain.sh /backups/2026-02-06/mailcow-2026-02-06-21-17-15 example.com --confirm
 ```
 
 
