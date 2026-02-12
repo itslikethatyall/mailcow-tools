@@ -9,7 +9,7 @@ I put my scripts in the `helper-scripts` folder alongside Mailcow's scripts for 
 
 ## Backup Restore Scripts
 
-Currently only works with Mailcow's own backup (working on borg and have switched my own server to using it to give me the motivation, and Mailcow's borg implementation supports per-mailbox restore anyway I suppose). 
+Restore individual domains or mailboxes from Mailcow backups. Currently only works with Mailcow's own backup (working on borg and have switched my own server to using it to give me the motivation, and Mailcow's borg implementation supports per-mailbox restore anyway I suppose). 
 
 These scripts work by extracting the domain in question from the Mailcow backup, copying it to a staging directory, and then validating all changes will work prior to restoring things to Mailcow's MariaDB and Redis databases.
 
